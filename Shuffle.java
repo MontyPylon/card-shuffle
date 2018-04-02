@@ -1,17 +1,19 @@
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 
 public class Shuffle {
 	
 	private ArrayList<Integer> cards = new ArrayList<Integer>();
-	private HashMap<Integer,Double> config = new HashMap<Integer, Double>();
+	//private HashMap<Integer,Double> config = new HashMap<Integer, Double>();
+	private HashMap<ArrayList<Integer>,Integer> config = new HashMap<ArrayList<Integer>, Integer>();
+	private HashSet<ArrayList<Integer>> prevShuffles = new HashSet<ArrayList<Integer>>();
 	private Random rand = new Random();
-	private long sampleSize = 20;
-	private int numCards = 3;
-	private double frequency = sampleSize / numCards;
-	private double chiSquared;
-	private int[] primes = {2,3,5};
+	private long sampleSize = 40000000;
+	private int numCards = 10;
 	
 	public static void main(String[] args) {
 		System.out.println("Beginning system.");
@@ -20,54 +22,63 @@ public class Shuffle {
 	}
 	
 	private void resetCards() {
-		cards.add(1);
-		cards.add(2);
-		cards.add(3);
+		for(int i = 1; i <= numCards; i++) {
+			cards.add(i);
+		}
 	}
 	
 	public void run() {
 		long counter = 0;
+		double chiSquared = 0;
 		resetCards();
+		
+		long permutations = 1;
+		// get the total number of permutations
+		for(int i = 1; i <= numCards; i++) {
+			permutations *= i;
+		}
+		double frequency = (double) sampleSize / (double) permutations;
+
+		
 		while(counter < sampleSize) {
-			int tally = 1;
+			ArrayList<Integer> shuffled = new ArrayList<Integer>();
 			for(int i = 0; i < numCards; i++) {
 				int n = rand.nextInt(cards.size());
-				tally *= Math.pow(primes[i],cards.get(n));
+				shuffled.add(cards.get(n));
 				cards.remove(n);
 			}
+			prevShuffles.add(shuffled);
 			resetCards();
-			if(config.containsKey(tally)) {
-				// increment size by one
-				config.put(tally, config.get(tally) + 1);
+			if(config.containsKey(shuffled)) {
+				config.put(shuffled, config.get(shuffled) + 1);
 			} else {
-				config.put(tally, 1.0);
+				config.put(shuffled, 1);
 			}
 			counter++;
+			if(counter % 1000000 == 0) {
+				System.out.println("at: " + counter);
+			}
 		}
 		
-        permute(java.util.Arrays.asList(1,2,3), 0);
-        chiSquared /= frequency;
+		chiSquared = getChiSquared(permutations, frequency);
+        //chiSquared /= frequency;
         System.out.println("chi-squared = " + chiSquared);
 	}
 	
-	
-	private void permute(java.util.List<Integer> arr, int k){
-        for(int i = k; i < arr.size(); i++){
-            java.util.Collections.swap(arr, i, k);
-            permute(arr, k+1);
-            java.util.Collections.swap(arr, k, i);
-        }
-        if (k == arr.size() -1){
-            //System.out.println(java.util.Arrays.toString(arr.toArray()));
-            int tally = 1;
-            for(int i = 0; i < arr.size(); i++) {
-            	tally *= Math.pow(primes[i], arr.get(i));
-            }
-            //System.out.println("tally: " + tally);
-            if(config.containsKey(tally)) {
-				chiSquared += Math.pow((config.get(tally) - frequency),2);
-            }
-        }
-    }
-    
+	private double getChiSquared(long permutations, double frequency) {
+		long counter = 0;
+		double x = 0;
+		Iterator<ArrayList<Integer>> it = prevShuffles.iterator();
+	    while(it.hasNext()){
+	    	ArrayList<Integer> shuf = it.next();
+	    	if(config.containsKey(shuf)) {
+	    		x += Math.pow((config.get(shuf) - frequency), 2);
+	    	}
+	    	counter++;
+	    }
+	    long diff = permutations - counter;
+	    x += diff*frequency*frequency;
+	    x /= frequency;
+	    return x;
+	}
 }
