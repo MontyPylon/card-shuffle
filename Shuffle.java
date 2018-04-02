@@ -12,7 +12,7 @@ public class Shuffle {
 	private HashMap<ArrayList<Integer>,Integer> config = new HashMap<ArrayList<Integer>, Integer>();
 	private HashSet<ArrayList<Integer>> prevShuffles = new HashSet<ArrayList<Integer>>();
 	private Random rand = new Random();
-	private long sampleSize = 40000000;
+	private long sampleSize = 40000;
 	private int numCards = 10;
 	
 	public static void main(String[] args) {
@@ -22,6 +22,7 @@ public class Shuffle {
 	}
 	
 	private void resetCards() {
+		cards.removeAll(cards);
 		for(int i = 1; i <= numCards; i++) {
 			cards.add(i);
 		}
@@ -39,16 +40,9 @@ public class Shuffle {
 		}
 		double frequency = (double) sampleSize / (double) permutations;
 
-		
 		while(counter < sampleSize) {
-			ArrayList<Integer> shuffled = new ArrayList<Integer>();
-			for(int i = 0; i < numCards; i++) {
-				int n = rand.nextInt(cards.size());
-				shuffled.add(cards.get(n));
-				cards.remove(n);
-			}
-			prevShuffles.add(shuffled);
-			resetCards();
+			//ArrayList<Integer> shuffled = computerShuffle();
+			ArrayList<Integer> shuffled = dovetailShuffle();
 			if(config.containsKey(shuffled)) {
 				config.put(shuffled, config.get(shuffled) + 1);
 			} else {
@@ -80,5 +74,44 @@ public class Shuffle {
 	    x += diff*frequency*frequency;
 	    x /= frequency;
 	    return x;
+	}
+	
+	private ArrayList<Integer> computerShuffle() {
+		ArrayList<Integer> shuffled = new ArrayList<Integer>();
+		for(int i = 0; i < numCards; i++) {
+			int n = rand.nextInt(cards.size());
+			shuffled.add(cards.get(n));
+			cards.remove(n);
+		}
+		prevShuffles.add(shuffled);
+		resetCards();
+		return shuffled;
+	}
+	
+	private ArrayList<Integer> dovetailShuffle() {
+		ArrayList<Integer> shuffled = new ArrayList<Integer>();
+		int half = numCards / 2;
+		List<Integer> firstHalf = cards.subList(0, half);
+		List<Integer> secondHalf = cards.subList(half, numCards);
+		int firstIndex = 0;
+		int secondIndex = 0;
+		for(int i = 0; i < numCards; i++) {
+			int n = rand.nextInt(2);
+			if(n == 0 && (firstIndex != firstHalf.size() - 1)) {
+				shuffled.add(firstHalf.get((firstIndex)));
+				firstIndex++;
+			} else if(n == 1 && (secondIndex != secondHalf.size() - 1)) {
+				shuffled.add(secondHalf.get(secondIndex));
+				secondIndex++;
+			} else if(n == 0) {
+				shuffled.add(secondHalf.get(secondIndex));
+				secondIndex++;
+			} else if(n == 1) {
+				shuffled.add(firstHalf.get((firstIndex)));
+				firstIndex++;
+			}
+		}
+		prevShuffles.add(shuffled);
+		return shuffled;
 	}
 }
