@@ -12,8 +12,8 @@ public class Shuffle {
 	private HashMap<ArrayList<Integer>,Integer> config = new HashMap<ArrayList<Integer>, Integer>();
 	private HashSet<ArrayList<Integer>> prevShuffles = new HashSet<ArrayList<Integer>>();
 	private Random rand = new Random();
-	private long sampleSize = 40000;
-	private int numCards = 10;
+	private long sampleSize = 400;
+	private int numCards = 3;
 	
 	public static void main(String[] args) {
 		System.out.println("Beginning system.");
@@ -42,7 +42,14 @@ public class Shuffle {
 
 		while(counter < sampleSize) {
 			//ArrayList<Integer> shuffled = computerShuffle();
-			ArrayList<Integer> shuffled = dovetailShuffle();
+			ArrayList<Integer> shuffled0 = dovetailShuffle(cards);
+			ArrayList<Integer> shuffled1 = dovetailShuffle(shuffled0);
+			ArrayList<Integer> shuffled2 = dovetailShuffle(shuffled1);
+			ArrayList<Integer> shuffled3 = dovetailShuffle(shuffled2);
+			ArrayList<Integer> shuffled4 = dovetailShuffle(shuffled3);
+			ArrayList<Integer> shuffled5 = dovetailShuffle(shuffled4);
+			ArrayList<Integer> shuffled6 = dovetailShuffle(shuffled5);
+			ArrayList<Integer> shuffled = dovetailShuffle(shuffled6);
 			if(config.containsKey(shuffled)) {
 				config.put(shuffled, config.get(shuffled) + 1);
 			} else {
@@ -88,7 +95,7 @@ public class Shuffle {
 		return shuffled;
 	}
 	
-	private ArrayList<Integer> dovetailShuffle() {
+	private ArrayList<Integer> dovetailShuffle(ArrayList<Integer> cards) {
 		ArrayList<Integer> shuffled = new ArrayList<Integer>();
 		int half = numCards / 2;
 		List<Integer> firstHalf = cards.subList(0, half);
@@ -97,10 +104,10 @@ public class Shuffle {
 		int secondIndex = 0;
 		for(int i = 0; i < numCards; i++) {
 			int n = rand.nextInt(2);
-			if(n == 0 && (firstIndex != firstHalf.size() - 1)) {
+			if(n == 0 && (firstIndex <= firstHalf.size() - 1)) {
 				shuffled.add(firstHalf.get((firstIndex)));
 				firstIndex++;
-			} else if(n == 1 && (secondIndex != secondHalf.size() - 1)) {
+			} else if(n == 1 && (secondIndex <= secondHalf.size() - 1)) {
 				shuffled.add(secondHalf.get(secondIndex));
 				secondIndex++;
 			} else if(n == 0) {
