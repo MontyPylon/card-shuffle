@@ -135,6 +135,7 @@ public class Shuffle {
 		for(int i=0;i<cards.size();i++) {
 			shuffled.set(i,cards.get(order[i]));
 		}
+		prevShuffles.add(shuffled);
 		return shuffled;
 	}
 	private void mergeShuffleR(int order[], int start, int finish){
