@@ -10,10 +10,8 @@ import java.util.Random;
 public class NewShuffle {
 	
 	private ArrayList<Integer> cards = new ArrayList<Integer>();
-	//private HashMap<Integer,Double> config = new HashMap<Integer, Double>();
 	private HashMap<ArrayList<Integer>,Integer> config = new HashMap<ArrayList<Integer>, Integer>();
-	private HashSet<ArrayList<Integer>> prevShuffles = new HashSet<ArrayList<Integer>>();
-	//private long[] place1 = new long[numCards];
+	//private HashSet<ArrayList<Integer>> prevShuffles = new HashSet<ArrayList<Integer>>();
 	private long[][]places = new long[numCards][numCards];
 	private Random rand = new Random();
 	private long sampleSize = numCards * 10000;
@@ -40,7 +38,7 @@ public class NewShuffle {
 		while(counter < sampleSize) {
 			//ArrayList<Integer> shuffled = computerShuffle();
 			ArrayList<Integer> shuffled = dovetailShuffle(cards);
-			for(int i = 0; i < 10; i++) {
+			for(int i = 0; i < 9; i++) {
 				shuffled = dovetailShuffle(shuffled);
 			}
 			//ArrayList<Integer> shuffled = mergeShuffle(cards);
@@ -86,17 +84,14 @@ public class NewShuffle {
 			shuffled.add(cards.get(n));
 			cards.remove(n);
 		}
-		prevShuffles.add(shuffled);
+		//prevShuffles.add(shuffled);
 		resetCards();
 		return shuffled;
 	}
 	
 	private ArrayList<Integer> dovetailShuffle(ArrayList<Integer> cards) {
 		ArrayList<Integer> shuffled = new ArrayList<Integer>();
-		int randFactor = rand.nextInt(numCards/2);
-		int randSign = rand.nextInt(2);
-		if(randSign == 0) randSign = -1;
-		int half = (numCards + randFactor*randSign) / 2;
+		int half = numCards/2;
 		List<Integer> firstHalf = cards.subList(0, half);
 		List<Integer> secondHalf = cards.subList(half, numCards);
 		int firstIndex = 0;
@@ -117,7 +112,7 @@ public class NewShuffle {
 				firstIndex++;
 			}
 		}
-		prevShuffles.add(shuffled);
+		//prevShuffles.add(shuffled);
 		return shuffled;
 	}
 	
@@ -132,7 +127,7 @@ public class NewShuffle {
 		for(int i=0;i<cards.size();i++) {
 			shuffled.set(i,cards.get(order[i]));
 		}
-		prevShuffles.add(shuffled);
+		//prevShuffles.add(shuffled);
 		return shuffled;
 	}
 	private void mergeShuffleR(int order[], int start, int finish){
@@ -162,6 +157,4 @@ public class NewShuffle {
 		return;
 		}
 	}
-	
-
 }
