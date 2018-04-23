@@ -160,7 +160,7 @@ public class NewShuffle {
 		}
 	}
 	private ArrayList<Integer> myagiShuffle(ArrayList<Integer> cards){
-		//Phase 1 - Build Array
+		//Phase 0 - Build Array
 		int arraySize = (int) Math.ceil(Math.sqrt(cards.size()));
 		int array[][] = new int[arraySize][arraySize];
 		for (int i = 0; i < arraySize;i++) {
@@ -171,13 +171,21 @@ public class NewShuffle {
 		int counter = 0;
 		int x = 0;
 		int y = 0;
-		while(counter < 52) {
-			x = rand.nextInt(arraySize);
-			y = rand.nextInt(arraySize);
-			if (array[x][y] == -1) {
-				array[x][y] = cards.get(counter);
-				counter++;
-			}
+		
+		//Phase 1 - Place down 
+		int grid = arraySize*arraySize;
+		ArrayList<Integer> places = new ArrayList<Integer>(grid);
+		for(int i = 0; i < grid; i++) {
+			places.add(i);
+		}
+		for(int i = 0; i < grid - numCards; i++) {
+			int r = rand.nextInt(places.size());
+			places.remove(r);
+		}
+		for(int k = 0; k < places.size(); k++) {
+			int i = places.get(k) % 8;
+			int j = places.get(k) / 8;
+			array[j][i] = cards.get(k);
 		}
 		//Phase 2 - Swipe
 		int sectionSize = arraySize/2;
