@@ -163,20 +163,24 @@ public class NewShuffle {
 		//Phase 1 - Build Array
 		int arraySize = (int) Math.ceil(Math.sqrt(cards.size()));
 		int array[][] = new int[arraySize][arraySize];
+		for (int i = 0; i < arraySize;i++) {
+			for (int j = 0; j < arraySize; j++) {
+				array[i][j] = -1;
+			}
+		}
 		int counter = 0;
 		int x = 0;
 		int y = 0;
 		while(counter < 52) {
 			x = rand.nextInt(arraySize);
 			y = rand.nextInt(arraySize);
-			if (array[x][y] == 0) {
+			if (array[x][y] == -1) {
 				array[x][y] = cards.get(counter);
 				counter++;
 			}
 		}
 		//Phase 2 - Swipe
 		int sectionSize = arraySize/2;
-		System.out.println("SectionSize="+sectionSize);
 		for (int line = sectionSize-1; line >= 0; line--) {
 			for (int i = 0; i < sectionSize ; i++) {
 				for (int j = 0; j < arraySize ; j++) {
@@ -203,13 +207,11 @@ public class NewShuffle {
 		ArrayList<Integer> shuffled = new ArrayList<Integer>(cards.size());
 		for (int i = 0; i < arraySize;i++) {
 			for (int j = 0; j < arraySize; j++) {
-				if (array[i][j] != 0) {
+				if (array[i][j] != -1) {
 					shuffled.add(array[i][j]);
 				}
 			}
 		}
-		System.out.println(Arrays.deepToString(array).replace("], ", "]\n"));
-		System.out.println(shuffled);
 
 		
 		return shuffled;
