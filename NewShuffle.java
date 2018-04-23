@@ -37,11 +37,13 @@ public class NewShuffle {
 
 		while(counter < sampleSize) {
 			//ArrayList<Integer> shuffled = computerShuffle();
-			ArrayList<Integer> shuffled = dovetailShuffle(cards);
-			for(int i = 0; i < 9; i++) {
-				shuffled = dovetailShuffle(shuffled);
-			}
+			//ArrayList<Integer> shuffled = dovetailShuffle(cards);
 			//ArrayList<Integer> shuffled = mergeShuffle(cards);
+			ArrayList<Integer> shuffled = myagiShuffle(cards);
+			for(int i = 0; i < 253; i++) {
+				//shuffled = dovetailShuffle(shuffled);
+				//shuffled = mergeShuffle(shuffled);
+			}
 			
 			for(int i = 0; i < numCards; i++) {
 				int placement = shuffled.indexOf(i);
@@ -49,7 +51,7 @@ public class NewShuffle {
 			}
 			
 			counter++;
-			if(counter % 1000 == 0) {
+			if(counter % 10000 == 0) {
 				System.out.println("at: " + counter);
 			}
 		}
@@ -156,5 +158,60 @@ public class NewShuffle {
 		mergeShuffleR(order, start+half, finish);
 		return;
 		}
+	}
+	private ArrayList<Integer> myagiShuffle(ArrayList<Integer> cards){
+		//Phase 1 - Build Array
+		int arraySize = (int) Math.ceil(Math.sqrt(cards.size()));
+		int array[][] = new int[arraySize][arraySize];
+		int counter = 0;
+		int x = 0;
+		int y = 0;
+		while(counter < 52) {
+			x = rand.nextInt(arraySize);
+			y = rand.nextInt(arraySize);
+			if (array[x][y] == 0) {
+				array[x][y] = cards.get(counter);
+				counter++;
+			}
+		}
+		//Phase 2 - Swipe
+		int sectionSize = arraySize/2;
+		System.out.println("SectionSize="+sectionSize);
+		for (int line = sectionSize-1; line >= 0; line--) {
+			for (int i = 0; i < sectionSize ; i++) {
+				for (int j = 0; j < arraySize ; j++) {
+					if (rand.nextInt(2) == 1) {
+						int temp = array[line][j];
+						array[line][j] = array[sectionSize+i][j];
+						array[sectionSize+i][j] = temp;
+					}
+				}
+			}
+		}
+		for (int line = sectionSize-1; line >= 0; line--) {
+			for (int i = 0; i < sectionSize ; i++) {
+				for (int j = 0; j < arraySize ; j++) {
+					if (rand.nextInt(2) == 1) {
+						int temp = array[j][line];
+						array[j][line] = array[j][sectionSize+i];
+						array[j][sectionSize+i] = temp;
+					}
+				}
+			}
+		}
+		//Phase 3 - Pick up 
+		ArrayList<Integer> shuffled = new ArrayList<Integer>(cards.size());
+		for (int i = 0; i < arraySize;i++) {
+			for (int j = 0; j < arraySize; j++) {
+				if (array[i][j] != 0) {
+					shuffled.add(array[i][j]);
+				}
+			}
+		}
+		System.out.println(Arrays.deepToString(array).replace("], ", "]\n"));
+		System.out.println(shuffled);
+
+		
+		return shuffled;
 	}
 }
